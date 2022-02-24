@@ -59,15 +59,63 @@ def logout_request(request):
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     context = {}
+    url = ""
+    context["dealerships"] = get_dealers_from_cf(url)
     if request.method == "GET":
         return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
-# def get_dealer_details(request, dealer_id):
-# ...
+def get_dealer_details(request, dealer_id):
+    context = {}
+    url = ""
+    dealer_details = get_dealer_reviews_from_cf(url,dealer_id)
+    context["dealer_id"]=dealer_id
+    context["reviews"]=dealer_details    
+    return render(request, 'djangoapp/dealer_details.html', context)
+
 
 # Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
-# ...
+def add_review(request, dealer_id):
+     context = {}
+    if request.method == 'GET':
+        url = ""
+        context = {
+            "dealer_id": dealer_id,
+            "dealer_name": get_dealers_from_cf(url)[dealer_id-1].full_name,
+            "cars": CarModel.objects.all()
+        }
+        return render(request, 'djangoapp/add_review.html', context)
+    
+    elif request.method == 'POST':
+        if (request.user.is_authenticated):
+            review = dict()
+            review["id"]=0
+            review["name"]=request.POST["name"]
+            review["dealership"]=dealer_id
+            review["review"]=request.POST["content"]
+            if ("purchasecheck" in request.POST):
+                review["purchase"]=True
+            else:
+                review["purchase"]=False
+            print(request.POST["car"])
+            if review["purchase"] == True:
+                car_parts=request.POST["car"].split("|")
+                review["purchase_date"]=request.POST["purchase_date"] 
+                review["car_make"]=car_parts[0]
+                review["car_model"]=car_parts[1]
+                review["car_year"]=car_parts[2]
+
+            else:
+                review["purchase_date"]=None
+                review["car_make"]=None
+                review["car_model"]=None
+                review["car_year"]=None
+            json_result = post_request("", review, dealerId=dealer_id)
+            if "error" in json_result:
+                context["message"] = "ERROR: Review was not submitted."
+            else:
+                context["message"] = "Review was submited"
+        return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
+
 
