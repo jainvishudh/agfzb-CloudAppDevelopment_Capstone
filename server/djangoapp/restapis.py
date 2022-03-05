@@ -106,8 +106,8 @@ def store_review(url, payload):
 
     
 def analyze_review_sentiments(text):
-    url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/1d6d2a23-a3c3-4ecb-bb1d-1d3eebb6a8c6/v1/analyze?version=2021-03-25"
-    api_key = "ul4LUhas5N_IUWIGV1wfauUZ-8W1f9JfxbOgM_2ve79j"
+    url = "https://api.eu-gb.natural-language-understanding.watson.cloud.ibm.com/instances/cb974596-e392-4c72-8260-b17e0760fe66"
+    api_key = "ycYSfqGafrRqH5ICOR80xTq42nxHJ4zZoSDC9ZY9Evuk"
     params = {
         "text": text,
         "features": {
